@@ -13,7 +13,6 @@ It can hold any kind of value — a number, a text, a list, or even another obje
 A method is a function defined inside the class.  
 When we call it, it works on the particular object that owns it.
 
----
 
 **Why this matters**
 
@@ -37,7 +36,6 @@ For one hundred or ten thousand it becomes a swamp of scattered variables. Chang
 
 A class lets us write the plan once. Then we create as many enemy objects as we need from that single plan. Everything stays together and stays manageable.
 
----
 
 **The Simplest Class**
 
@@ -122,7 +120,6 @@ Write a class called Hero that contains:
 
 Then create one hero named “Aragon” with health 100 and attack_power 25, and call its fight method.
 
----
 
 **A Clear Hero Class**
 
@@ -175,7 +172,6 @@ jones.fight()
 Create a second hero named “Smith” with health 80 and attack 20.  
 Then call the fight method on both jones and smith.
 
----
 
 **Methods That Work With Other Objects**
 
@@ -251,7 +247,6 @@ Jack now has 40 health.
 Add a second call so that person3 attacks person1.  
 Observe that both objects keep their own health values independently.
 
----
 
 **Why self Always Points to the Caller**
 
@@ -325,7 +320,6 @@ Final health of Jack: 20
 Make person3 attack person1 once.  
 Then print the final health of both person1 and person3.
 
----
 
 **A Complete Text-Based Battle System**
 
@@ -394,7 +388,6 @@ person3.heal(35)
 Change the attack values so that the third hero survives the first blow yet falls to the second.  
 Then let a living hero heal and observe the difference.
 
----
 
 **Reviewing the Battle System**
 
