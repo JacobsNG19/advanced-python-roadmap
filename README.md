@@ -8,7 +8,6 @@ We treat them as a way of thinking — a disciplined method for keeping data and
 
 The material moves from the simplest possible ideas to the habits that make larger systems manageable. Every step is deliberate. Nothing is introduced before the ground has been prepared.
 
----
 
 ### What Object-Oriented Programming offers
 
@@ -22,7 +21,6 @@ At its heart, Object-Oriented Programming rests on a few quiet strengths:
 
 These ideas are not advanced techniques. They are the foundation of readable, maintainable code. Once they are understood, many other topics in programming become easier to approach.
 
----
 
 ### How we teach
 
@@ -38,7 +36,6 @@ Each lesson contains:
 
 We avoid artificial-intelligence examples and game-centric illustrations when they are not needed. The goal is not to impress, but to make the concepts feel natural and useful.
 
----
 
 ### The path we follow
 
@@ -60,7 +57,6 @@ The writing throughout tries to be:
 If a sentence can be shorter, it is shortened.  
 If an idea can be shown with less code, less code is used.
 
----
 
 ### How to use this repository
 
