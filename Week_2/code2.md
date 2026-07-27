@@ -76,14 +76,115 @@ When does each choice serve the larger program better?
 
 **Next small step**
 
-Add a second method called `forward_non_negative` that:
+Now that we have a working Neuron, we make it more complete.
 
-1. Calls the ordinary `forward` method.  
-2. Returns the result only when it is greater than zero.  
-3. Returns zero when the result is zero or negative.
+A neuron does not simply return the weighted sum plus bias. It first passes that value through a small decision step that keeps only positive results and turns everything else to zero.
 
-This leaves the original method pure while giving a convenient way to refuse negative results when they are not wanted.
+We add a method called `activate` that receives a number and returns:
 
-**Small Practice**
+- the number itself when it is greater than zero  
+- zero when the number is zero or negative  
 
-Create one neuron, call both methods with matching lists, then call them again with mismatched lists and observe the different outcomes.
+We then change the `forward` method so that it:
+
+1. computes the weighted sum plus bias  
+2. passes that result through `activate`  
+3. returns the final value
+
+```python
+class Neuron:
+    def __init__(self, weights, bias):
+        self.weights = weights   
+        self.bias = bias         
+
+    def forward(self, inputs):
+
+        # We raise a clear error when the lists do not match in length.
+        # This stops the calculation immediately and tells the caller exactly what went wrong.
+        if len(self.weights) != len(inputs):
+            raise ValueError("Input size mismatch: number of inputs must match number of weights.")
+        
+        total = 0
+        for weight, input_val in zip(self.weights, inputs):
+            total += weight * input_val
+        total += self.bias
+
+        # We pass the raw total through relu before returning it.
+        return self.relu(total)
+
+    # relu keeps positive values unchanged and turns everything else to zero.
+    def relu(self, x):
+
+        if x > 0:
+            return x
+        
+        return 0
+    
+neuron_instance = Neuron([0.5, -0.2, 0.1], 0.3)
+inputs = [1.0, 2.0, 3.0]
+
+print(neuron_instance.forward(inputs))
+```
+
+That is clean and correct work.  
+
+We took the idea of keeping only positive values, fitted it into the class, and implemented it with care. Raising a `ValueError` with a clear message instead of returning `None` is a mature decision.
+
+Here is the exact flow of the code we wrote.
+
+**Execution Breakdown**
+
+1. We create a neuron:
+   ```python
+   neuron_instance = Neuron([0.5, -0.2, 0.1], 0.3)
+   ```
+   - weights = [0.5, -0.2, 0.1]  
+   - bias = 0.3  
+
+2. We call `forward` with inputs = [1.0, 2.0, 3.0]
+
+3. Inside `forward`:
+   - The length check passes (3 == 3).  
+   - total starts at 0.  
+   - The loop runs:
+     - 0.5 × 1.0 → total becomes 0.5  
+     - –0.2 × 2.0 → total becomes 0.1  
+     - 0.1 × 3.0 → total becomes 0.4  
+   - The bias is added: 0.4 + 0.3 = 0.7  
+   - The method returns `self.relu(0.7)`
+
+4. Inside `relu`:
+   - 0.7 > 0 is true, so 0.7 is returned unchanged.
+
+5. The printed result is 0.7
+
+**What we have built**
+
+We now have a class that:
+
+- accepts a list of inputs  
+- multiplies them by its stored weights  
+- adds its bias  
+- keeps only the positive part of the result  
+
+**One further improvement**
+
+At present the weights are fixed at creation.  
+We can make the class more flexible by adding a method that replaces the weights after the object already exists.
+
+**Next small step**
+
+Add a method called `set_weights` that:
+
+- receives a new list of weights  
+- replaces the existing weights  
+- raises a `ValueError` if the new list does not have the same length as the current weights  
+
+Then we test it by:
+
+1. creating a neuron with weights [0.5, –0.2, 0.1] and bias 0.3  
+2. calling `forward` on [1.0, 2.0, 3.0] (expect 0.7)  
+3. changing the weights to [1.0, 1.0, 1.0] with `set_weights`  
+4. calling `forward` again on the same inputs (expect 6.3)
+
+We write the code, run it, and note both the new output and the reason it changed.
