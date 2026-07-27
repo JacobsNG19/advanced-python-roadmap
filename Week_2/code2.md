@@ -94,7 +94,6 @@ This keeps the original method pure and gives us a convenient way to refuse nega
 
 Create a calculator, call both methods with matching lists, then call them again with mismatched lists and observe the different outcomes.
 
----
 
 **Real-world exercise**
 
