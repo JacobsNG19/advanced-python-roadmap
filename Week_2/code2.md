@@ -87,11 +87,3 @@ This leaves the original method pure while giving a convenient way to refuse neg
 **Small Practice**
 
 Create one neuron, call both methods with matching lists, then call them again with mismatched lists and observe the different outcomes.
-
-
-**Real-world exercise**
-
-Design a ShippingCost class that stores a list of distance rates and a fixed handling fee.  
-Add a method that receives a list of package weights, multiplies each weight by its corresponding rate, adds the handling fee, and returns the total.  
-If the number of rates does not match the number of weights, the method must refuse to calculate.  
-Create one shipping-cost object and test it with both matching and mismatched lists.
