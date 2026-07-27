@@ -39,3 +39,66 @@ print(result)   # 0.7
 **Small Practice**
 
 Create a second calculator with different factors and offset, then call `compute` with a new list of values and observe the independent result.
+
+
+**A More Careful Calculator**
+
+We now strengthen the class so that it refuses to work when the lists do not match in length.
+
+```python
+class Calculator:
+    def __init__(self, factors, offset):
+        self.factors = factors
+        self.offset = offset
+
+    def compute(self, values):
+        if len(self.factors) != len(values):
+            return None
+
+        total = 0
+        for factor, value in zip(self.factors, values):
+            total += factor * value
+        total += self.offset
+        return total
+```
+
+**What we have done well**
+
+- The method now works for any number of values, provided the lengths agree.  
+- A clear check prevents silent mistakes when the lists are mismatched.  
+- The calculation remains inside the method; the decision to print or use the result stays outside.  
+- Variable names stay plain and honest.
+
+**One subtle improvement to consider**
+
+Returning `None` is correct, yet it forces every caller to test for `None`.  
+
+Raising a `ValueError` with a short, descriptive message would tell the caller exactly what went wrong and leave the decision about how to recover in the caller’s hands.
+
+**Question we may ask ourselves**
+
+What is the practical difference between returning `None` and raising an exception?  
+When does each choice serve the larger program better?
+
+**Next small step**
+
+Add a second method called `compute_positive` that:
+
+1. Calls the ordinary `compute` method.  
+2. Returns the result only when it is greater than zero.  
+3. Returns zero when the result is zero or negative.
+
+This keeps the original method pure and gives us a convenient way to refuse negative totals when they make no sense.
+
+**Small Practice**
+
+Create a calculator, call both methods with matching lists, then call them again with mismatched lists and observe the different outcomes.
+
+---
+
+**Real-world exercise**
+
+Design a ShippingCost class that stores a list of distance rates and a fixed handling fee.  
+Add a method that receives a list of package weights, multiplies each weight by its corresponding rate, adds the handling fee, and returns the total.  
+If the number of rates does not match the number of weights, the method must refuse to calculate.  
+Create one shipping-cost object and test it with both matching and mismatched lists.
