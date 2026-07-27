@@ -1,0 +1,1 @@
+1. Design a ShippingCost class that holds a list of distance rates and a fixed handling fee. Add a method that receives a list of package weights, multiplies each weight by its corresponding rate, adds the handling fee, and returns the total cost. Create one shipping-cost object and calculate the price for a small set of packages.
