@@ -1,99 +1,95 @@
-**A Class That Computes a Weighted Sum**
+**A Class That Stores Weights and a Bias**
 
-We now examine a class that stores a list of numbers together with a single extra number, then performs a calculation when asked.
+We examine a class that holds a list of numbers together with one extra number, then performs a calculation when asked.
 
 ```python
-class Calculator:
-    def __init__(self, factors, offset):
-        self.factors = factors   # a list of numbers
-        self.offset = offset     # a single number
+class Neuron:
+    def __init__(self, weights, bias):
+        self.weights = weights
+        self.bias = bias
 
-    def compute(self, values):
+    def forward(self, inputs):
         total = 0
-        for factor, value in zip(self.factors, values):
-            total += factor * value
-        total += self.offset
+        for weight, value in zip(self.weights, inputs):
+            total += weight * value
+        total += self.bias
         return total
 ```
 
 **What the pieces mean**
 
-- `zip(self.factors, values)` walks through the two lists side by side, pairing each factor with its matching value.  
-- The loop multiplies each pair and adds the product to a running total.  
-- The offset is added once at the end. Without it the result would always pass through the origin; the offset lets the result shift up or down freely.
+- `zip` walks the two lists side by side and pairs each weight with its corresponding input.  
+- The loop multiplies every pair and accumulates the products.  
+- The bias is added once at the end so the result may sit above or below zero.
 
 **Working example**
 
 ```python
-calc = Calculator([0.5, -0.2, 0.1], 0.3)
-result = calc.compute([1.0, 2.0, 3.0])
+n = Neuron([0.5, -0.2, 0.1], 0.3)
+result = n.forward([1.0, 2.0, 3.0])
 print(result)   # 0.7
 ```
 
 **What we keep in mind**
 
-- Attributes can hold lists as easily as single numbers.  
-- A method may receive another list and combine it with the object’s own data.  
-- Clear separation of stored data and calculation keeps the class easy to reuse.
+- An attribute may hold a list just as easily as a single number.  
+- A method can receive another list and combine it with the object’s own data.  
+- Keeping the stored values separate from the calculation makes the class easy to reuse.
 
-**Small Practice**
+---
 
-Create a second calculator with different factors and offset, then call `compute` with a new list of values and observe the independent result.
+**A More Careful Version**
 
-
-**A More Careful Calculator**
-
-We now strengthen the class so that it refuses to work when the lists do not match in length.
+We strengthen the method so that it refuses to work when the lists differ in length.
 
 ```python
-class Calculator:
-    def __init__(self, factors, offset):
-        self.factors = factors
-        self.offset = offset
+class Neuron:
+    def __init__(self, weights, bias):
+        self.weights = weights
+        self.bias = bias
 
-    def compute(self, values):
-        if len(self.factors) != len(values):
+    def forward(self, inputs):
+        if len(self.weights) != len(inputs):
             return None
 
         total = 0
-        for factor, value in zip(self.factors, values):
-            total += factor * value
-        total += self.offset
+        for weight, value in zip(self.weights, inputs):
+            total += weight * value
+        total += self.bias
         return total
 ```
 
-**What we have done well**
+**What we have gained**
 
-- The method now works for any number of values, provided the lengths agree.  
-- A clear check prevents silent mistakes when the lists are mismatched.  
-- The calculation remains inside the method; the decision to print or use the result stays outside.  
-- Variable names stay plain and honest.
+- The method now accepts any length, provided both lists match.  
+- A clear check prevents silent errors.  
+- The calculation stays inside the method; the decision to use or display the result stays outside.
 
-**One subtle improvement to consider**
+**One improvement worth considering**
 
-Returning `None` is correct, yet it forces every caller to test for `None`.  
+Returning `None` is correct, yet every caller must then test for `None`.  
+Raising a `ValueError` with a short message would tell the caller exactly what went wrong and leave the recovery decision in the caller’s hands.
 
-Raising a `ValueError` with a short, descriptive message would tell the caller exactly what went wrong and leave the decision about how to recover in the caller’s hands.
-
-**Question we may ask ourselves**
+**Question we may ask**
 
 What is the practical difference between returning `None` and raising an exception?  
 When does each choice serve the larger program better?
 
 **Next small step**
 
-Add a second method called `compute_positive` that:
+Add a second method called `forward_non_negative` that:
 
-1. Calls the ordinary `compute` method.  
+1. Calls the ordinary `forward` method.  
 2. Returns the result only when it is greater than zero.  
 3. Returns zero when the result is zero or negative.
 
-This keeps the original method pure and gives us a convenient way to refuse negative totals when they make no sense.
+This leaves the original method pure while giving a convenient way to refuse negative results when they are not wanted.
 
 **Small Practice**
 
-Create a calculator, call both methods with matching lists, then call them again with mismatched lists and observe the different outcomes.
+Create one neuron, call both methods with matching lists, then call them again with mismatched lists and observe the different outcomes.
 
+---
 
 **Real-world exercise**
 
