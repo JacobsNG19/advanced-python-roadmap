@@ -36,7 +36,6 @@ print(result)   # 0.7
 - A method can receive another list and combine it with the object’s own data.  
 - Keeping the stored values separate from the calculation makes the class easy to reuse.
 
----
 
 **A More Careful Version**
 
@@ -89,7 +88,6 @@ This leaves the original method pure while giving a convenient way to refuse neg
 
 Create one neuron, call both methods with matching lists, then call them again with mismatched lists and observe the different outcomes.
 
----
 
 **Real-world exercise**
 
