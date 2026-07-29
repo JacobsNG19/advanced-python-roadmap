@@ -188,3 +188,248 @@ Then we test it by:
 4. calling `forward` again on the same inputs (expect 6.3)
 
 We write the code, run it, and note both the new output and the reason it changed.
+
+```python
+class Neuron:
+    def __init__(self, weights, bias):
+        self.weights = weights   
+        self.bias = bias         
+
+    def forward(self, inputs):
+
+        if len(self.weights) != len(inputs):
+            raise ValueError("Input size mismatch: number of inputs must match number of weights.")      
+        total = 0
+        for weight, input_val in zip(self.weights, inputs):
+            total += weight * input_val
+        total += self.bias
+
+        return self.relu(total)
+
+    def relu(self, x):
+
+        if x > 0:
+            return x      
+        return 0
+
+    # We replace the existing weights with a new list.
+    # The method returns the new weights so the caller can confirm the change if desired.
+    def set_weights(self, new_weights):
+
+        self.weights = new_weights
+        return self.weights
+    
+neuron_instance = Neuron([0.5, -0.2, 0.1], 0.3)
+inputs = [1.0, 2.0, 3.0]
+
+print(neuron_instance.forward(inputs))
+neuron_instance.set_weights([1.0, 1.0, 1.0])
+print(neuron_instance.forward(inputs))
+```
+
+That is clean and correct work.  
+
+We fixed the essential point: the method now receives the new weights as a parameter and uses them to update the object.
+
+**What changed**
+
+| Before | After |
+|--------|-------|
+| The method ignored the parameter and used a fixed list | The method uses the parameter `new_weights` |
+| The assignment had to be done from outside | The method handles the assignment itself |
+| `None` was passed | A real list of new weights is passed |
+
+**What the code does now**
+
+1. We create a neuron with weights `[0.5, -0.2, 0.1]` and bias `0.3`.  
+2. We call `forward` on `[1.0, 2.0, 3.0]` → the result is `0.7`.  
+3. We change the weights to `[1.0, 1.0, 1.0]` with `set_weights`.  
+4. We call `forward` again on the same inputs:
+   - Weighted sum: `(1.0 × 1.0) + (1.0 × 2.0) + (1.0 × 3.0) + 0.3 = 6.3`  
+   - `relu(6.3)` returns `6.3`  
+5. The printed results are:
+   ```
+   0.7
+   6.3
+   ```
+
+**What we have solidly grasped**
+
+- Creating a class with `__init__`  
+- Writing instance methods (`forward`, `relu`, `set_weights`)  
+- Using `self` correctly  
+- Changing an attribute from inside a method  
+- Simple conditional logic  
+- Looping with `zip`  
+- Raising a clear exception when lengths do not match  
+
+**Next step**
+
+A single neuron is useful.  
+A collection of neurons that all receive the same inputs is more powerful. We call that collection a Layer.
+
+A Layer should:
+
+- hold several Neuron objects  
+- pass the same inputs to every neuron  
+- collect and return all of their outputs  
+
+**Question to consider first**
+
+If a layer contains 3 neurons, each neuron has 2 weights, and we pass in 2 inputs, how many multiplications occur in total?
+
+We answer that question in plain language. Once the answer is clear, we will write the Layer class together.
+
+We have to think in terms of computation.
+
+Each neuron performs 2 multiplications (one for every weight-input pair).  
+With 3 neurons the total becomes \(3 \times 2 = 6\) multiplications for a single forward pass through the layer.
+
+That number is the computational cost of the layer.
+
+
+**Building the Layer Class**
+
+A Layer holds several Neuron objects.  
+When we give it inputs, it passes those same inputs to every neuron and collects the results.
+
+**Skeleton**
+
+```python
+class Layer:
+    def __init__(self, neurons):
+        self.neurons = neurons   # list of Neuron objects
+
+    def forward(self, inputs):
+        # 1. Create an empty list to store the outputs
+        # 2. For each neuron in self.neurons:
+        #       call neuron.forward(inputs)
+        #       append the result to the list
+        # 3. Return the list
+        pass
+```
+
+**What the forward method must do**
+
+- Create an empty list.  
+- Walk through every neuron.  
+- Call each neuron’s `forward` method with the same inputs.  
+- Collect every result.  
+- Return the list of results.
+
+**Test**
+
+```python
+layer = Layer([
+    Neuron([0.1, 0.2], 0.5),
+    Neuron([-0.3, 0.4], -0.1),
+    Neuron([0.5, -0.6], 0.2)
+])
+
+inputs = [1.0, 2.0]
+outputs = layer.forward(inputs)
+print(outputs)
+```
+
+Expected results:
+
+- First neuron: \(0.1 \times 1.0 + 0.2 \times 2.0 + 0.5 = 1.0\) → relu keeps 1.0  
+- Second neuron: \(-0.3 \times 1.0 + 0.4 \times 2.0 - 0.1 = 0.4\) → relu keeps 0.4  
+- Third neuron: \(0.5 \times 1.0 + (-0.6) \times 2.0 + 0.2 = -0.5\) → relu turns it to 0  
+
+So the printed list should be `[1.0, 0.4, 0]`.
+
+**Task**
+
+Write the complete `Layer` class, create the example above, and print the outputs.
+
+**One further question**
+
+If a layer contains 5 neurons and each neuron has 4 weights, and we pass in a list of 4 values, how many multiplications occur in total? Explain why.
+
+This is clean and correct work. The `Layer` class functions as intended.
+
+Here are comments only on the parts that are new:
+
+```python
+class Neuron:
+    def __init__(self, weights, bias):
+        self.weights = weights
+        self.bias = bias
+
+    def forward(self, inputs):
+        if len(self.weights) != len(inputs):
+            raise ValueError("Input size mismatch: number of inputs must match number of weights.")
+        total = 0
+        for weight, input_val in zip(self.weights, inputs):
+            total += weight * input_val
+        total += self.bias
+        return self.relu(total)
+
+    def relu(self, x):
+        if x > 0:
+            return x
+        return 0
+
+class Layer:
+    # We store a list of Neuron objects so the layer can use them later.
+    def __init__(self, neurons):
+        self.neurons = neurons
+
+    # We pass the same inputs to every neuron and collect their results.
+    def forward(self, inputs):
+        # Empty list that will hold one output per neuron.
+        results = []
+
+        # Walk through each neuron belonging to this layer.
+        for neuron in self.neurons:
+            # Ask the neuron to compute its output.
+            x = neuron.forward(inputs)
+            # Keep the result.
+            results.append(x)
+
+        # Return the full list of outputs.
+        return results
+
+
+# A layer that contains three neurons. Each neuron expects two inputs.
+layer = Layer([
+    Neuron([0.1, 0.2], 0.5),
+    Neuron([-0.3, 0.4], -0.1),
+    Neuron([0.5, -0.6], 0.2)
+])
+
+# Pass the same two numbers through every neuron.
+outputs = layer.forward([1.0, 2.0])
+print(outputs)
+```
+
+**What we now have**
+
+| Component | Purpose |
+|-----------|---------|
+| `Neuron`  | One unit that holds weights, a bias, and applies relu. |
+| `Layer`   | A collection of neurons that all receive the same inputs and return a list of outputs. |
+
+These two pieces form the basic structure of a feed-forward network.
+
+A later step would be a Network class that holds several 
+
+**Next task**
+
+We build a `Network` class that:
+
+- Receives a list of `Layer` objects in `__init__`.  
+- Has a `forward(self, inputs)` method that:
+  - sends the inputs through the first layer,  
+  - takes that layer’s output and sends it through the second layer,  
+  - continues until every layer has been used,  
+  - returns the final result.
+
+We write the class ourselves.  
+
+If we become stuck, we note three things:
+
+- what we tried,  
+- what we expected to happen,  
+- what actually happened.
