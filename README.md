@@ -1,71 +1,135 @@
-# Object-Oriented Programming in Python  
-### A clear and careful introduction
 
-This repository is a place to learn Object-Oriented Programming properly.  
+```markdown
+# Advanced Python Mastery Roadmap
 
-We do not treat classes as a collection of syntax rules.  
-We treat them as a way of thinking — a disciplined method for keeping data and behaviour together so that programs remain understandable as they grow.
+A structured learning path to master **Advanced Python** — from deep language features to professional practices.
 
-The material moves from the simplest possible ideas to the habits that make larger systems manageable. Every step is deliberate. Nothing is introduced before the ground has been prepared.
+This roadmap is organized into **9 progressive stages**. Follow them in order for the best results.
 
+---
 
-### What Object-Oriented Programming offers
+## Prerequisites
 
-At its heart, Object-Oriented Programming rests on a few quiet strengths:
+Before starting, you should already be comfortable with:
+- Python basics (variables, control flow, functions, data structures)
+- Intermediate concepts (basic OOP, list/dict comprehensions, modules, exceptions, file I/O)
 
-- A class is a blueprint. An object is one concrete realisation of that blueprint.  
-- Data and the actions that belong with that data live together.  
-- Many independent objects can be created from a single plan, each carrying its own state.  
-- Objects may interact with one another in controlled and predictable ways.  
-- Simple checks and clear boundaries protect a program from invalid states.
+---
 
-These ideas are not advanced techniques. They are the foundation of readable, maintainable code. Once they are understood, many other topics in programming become easier to approach.
+## Learning Path
 
+### 1. Advanced Functions & Functional Tools
+- Closures and nested functions
+- Decorators (function, class, parameterized)
+- `*args` / `**kwargs` deeply + argument unpacking
+- `functools` (`partial`, `lru_cache`, `singledispatch`, etc.)
+- `itertools` and advanced iteration patterns
 
-### How we teach
+### 2. Iterators, Generators & Context Managers
+- Custom iterators (`__iter__` / `__next__`)
+- Generators (`yield`, `yield from`, generator expressions)
+- Generator-based coroutines
+- Context managers (`with` statement, `contextlib`)
 
-We favour short, complete examples over long theoretical discussions.  
+### 3. Advanced Object-Oriented Programming & Object Model
+- Comprehensive dunder/magic methods
+- Properties, descriptors, and the descriptor protocol
+- Inheritance deep dive (MRO, `super()`, mixins)
+- Abstract Base Classes (`abc`)
+- Dataclasses and modern data modeling
+- Metaclasses
 
-Each lesson contains:
+### 4. Modern Type System & Static Typing
+- Advanced type hints (Generics, `TypeVar`, `Protocol`, `TypedDict`, `Literal`, `Annotated`)
+- Structural vs nominal subtyping
+- `mypy` / `pyright` usage
+- Runtime type checking patterns
 
-- A direct explanation of one idea  
-- A working piece of code that demonstrates the idea cleanly  
-- A brief reminder of what must be remembered  
-- A small practice task  
-- One realistic exercise drawn from ordinary life — shipping costs, inventory, memberships, fuel levels, paper trays, and similar everyday systems
+### 5. Concurrency & Parallelism
+- Threading (GIL, locks, queues, thread safety)
+- Multiprocessing
+- `concurrent.futures`
+- Asyncio deeply (`async`/`await`, tasks, event loop, structured concurrency)
 
-We avoid artificial-intelligence examples and game-centric illustrations when they are not needed. The goal is not to impress, but to make the concepts feel natural and useful.
+### 6. Performance, Internals & Optimization
+- Profiling (`cProfile`, `py-spy`, memory profiling)
+- Memory model, garbage collection, `__slots__`, weak references
+- Understanding the GIL (and free-threaded Python)
+- Optimization techniques
+- Optional: Cython / Numba / C extensions
 
+### 7. Testing, Quality & Tooling
+- Advanced `pytest` (fixtures, parametrization, mocking, plugins)
+- Property-based testing (`hypothesis`)
+- Logging best practices
+- Modern linting & formatting (`ruff`)
+- Advanced debugging techniques
 
-### The path we follow
+### 8. Packaging, Project Structure & Distribution
+- Modern packaging (`pyproject.toml`, `uv`, Hatch, Poetry)
+- Virtual environments & dependency management at scale
+- Building and publishing packages
+- Application structure for larger projects
 
-We begin with the four essential notions: class, object, attribute, and method.  
+### 9. Metaprogramming & Advanced Patterns
+- Deep introspection (`inspect`, dynamic attributes)
+- Design patterns the Pythonic way
+- Writing library / framework-level code
+- Advanced standard library exploration
 
-We learn why a constructor exists and how each object keeps its own independent data.  
+---
 
-We then explore how one object may safely influence another, how to refuse invalid actions, and how a class can work with collections of values.  
+## Suggested Repository Structure
 
-Later we examine inheritance, encapsulation, and composition — always as natural extensions of the same core principles, never as separate mysteries.
+```text
+advanced-python/
+├── 01-advanced-functions/
+├── 02-iterators-generators/
+├── 03-advanced-oop/
+├── 04-type-system/
+├── 05-concurrency/
+├── 06-performance/
+├── 07-testing-tooling/
+├── 08-packaging/
+├── 09-metaprogramming/
+├── notes/
+├── projects/
+└── README.md
+```
 
-The writing throughout tries to be:
+---
 
-- Precise rather than vague  
-- Patient rather than hurried  
-- Clear rather than clever  
-- Modest rather than impressive  
+## How to Use This Roadmap
 
-If a sentence can be shorter, it is shortened.  
-If an idea can be shown with less code, less code is used.
+1. Create a folder for each stage.
+2. Take notes and write small examples as you learn.
+3. Build at least one mini-project per stage.
+4. Track your progress by checking off topics.
+5. Move to the next stage only when you feel comfortable explaining the concepts out loud.
 
+---
 
-### How to use this repository
+## Recommended Resources
 
-Read one idea at a time.  
-Type the examples.  
-Change the values and observe the results.  
-Complete the practice before moving forward.  
+- [Fluent Python (2nd Edition) – Luciano Ramalho](https://www.oreilly.com/library/view/fluent-python-2nd/9781492056348/)
+- [Real Python Advanced Learning Paths](https://realpython.com/learning-paths/)
+- [David Beazley’s Advanced Python Mastery](https://github.com/dabeaz-course/python-mastery)
+- [Official Python Documentation](https://docs.python.org/3/) + [CPython source](https://github.com/JacobsNG19/cpython)
 
-There is no advantage in speed.  
-There is only the quiet confidence that comes from understanding what a class truly is and why it is worth using.
+---
 
-We learn together, one careful step after another.
+## Progress Tracker
+
+- [ ] 1. Advanced Functions & Functional Tools
+- [ ] 2. Iterators, Generators & Context Managers
+- [ ] 3. Advanced OOP & Object Model
+- [ ] 4. Modern Type System & Static Typing
+- [ ] 5. Concurrency & Parallelism
+- [ ] 6. Performance, Internals & Optimization
+- [ ] 7. Testing, Quality & Tooling
+- [ ] 8. Packaging, Project Structure & Distribution
+- [ ] 9. Metaprogramming & Advanced Patterns
+
+---
+
+made by Jacob NGANDU Toussaint with AI structure
