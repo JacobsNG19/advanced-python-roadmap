@@ -1,12 +1,9 @@
-
-```markdown
 # Advanced Python Mastery Roadmap
 
 A structured learning path to master **Advanced Python** — from deep language features to professional practices.
 
 This roadmap is organized into **9 progressive stages**. Follow them in order for the best results.
 
----
 
 ## Prerequisites
 
@@ -14,7 +11,6 @@ Before starting, you should already be comfortable with:
 - Python basics (variables, control flow, functions, data structures)
 - Intermediate concepts (basic OOP, list/dict comprehensions, modules, exceptions, file I/O)
 
----
 
 ## Learning Path
 
@@ -77,7 +73,6 @@ Before starting, you should already be comfortable with:
 - Writing library / framework-level code
 - Advanced standard library exploration
 
----
 
 ## Suggested Repository Structure
 
@@ -97,7 +92,6 @@ advanced-python/
 └── README.md
 ```
 
----
 
 ## How to Use This Roadmap
 
@@ -107,7 +101,6 @@ advanced-python/
 4. Track your progress by checking off topics.
 5. Move to the next stage only when you feel comfortable explaining the concepts out loud.
 
----
 
 ## Recommended Resources
 
@@ -116,7 +109,6 @@ advanced-python/
 - [David Beazley’s Advanced Python Mastery](https://github.com/dabeaz-course/python-mastery)
 - [Official Python Documentation](https://docs.python.org/3/) + [CPython source](https://github.com/JacobsNG19/cpython)
 
----
 
 ## Progress Tracker
 
@@ -130,6 +122,5 @@ advanced-python/
 - [ ] 8. Packaging, Project Structure & Distribution
 - [ ] 9. Metaprogramming & Advanced Patterns
 
----
 
 made by Jacob NGANDU Toussaint with AI structure
