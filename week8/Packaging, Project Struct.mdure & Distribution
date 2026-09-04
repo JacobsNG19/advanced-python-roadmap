@@ -1,0 +1,612 @@
+# 1. Recommended default
+
+For a new Python application or package, use:
+
+```
+src/ layout
+pyproject.toml
+uv
+uv.lock
+Hatchling build backend
+pytest
+Ruff
+Pyright
+CI
+```
+
+`pyproject.toml` centralizes project metadata, dependencies, build configuration, and tool settings. The Packaging User Guide defines `[build-system]`, `[project]`, and `[tool]` as its main configuration areas.[[packaging.python](https://packaging.python.org/en/latest/guides/writing-pyproject-toml/)]
+
+# 2. Project structure
+
+```
+trustdesk/
+├── pyproject.toml
+├── README.md
+├── LICENSE
+├── uv.lock
+├── src/
+│   └── trustdesk/
+│       ├── __init__.py
+│       ├── __main__.py
+│       ├── cli.py
+│       ├── config.py
+│       ├── domain/
+│       │   ├── tickets.py
+│       │   └── users.py
+│       ├── application/
+│       │   └── ticket_service.py
+│       ├── infrastructure/
+│       │   ├── database.py
+│       │   └── llm_clients.py
+│       └── interfaces/
+│           ├── repositories.py
+│           └── providers.py
+└── tests/
+    ├── conftest.py
+    ├── test_tickets.py
+    └── test_services.py
+```
+
+Responsibilities:
+
+```
+domain/          → business concepts and rules
+application/     → use cases and services
+infrastructure/ → databases, APIs, files, external systems
+interfaces/      → Protocols and abstract contracts
+cli.py           → command-line interface
+config.py        → configuration loading
+tests/           → automated tests
+```
+
+The `src/` layout helps ensure tests import the installed package rather than accidentally importing files directly from the project root.
+
+# 3. `pyproject.toml`
+
+A practical starting point:
+
+```
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "trustdesk"
+version = "0.1.0"
+description = "AI-assisted support operations."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { file = "LICENSE" }
+authors = [
+    { name = "Toussaint Jacobs" },
+]
+dependencies = [
+    "httpx>=0.27",
+]
+
+[project.optional-dependencies]
+postgres = [
+    "psycopg[binary]>=3.2",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "pytest-cov>=5",
+    "ruff>=0.6",
+    "pyright>=1.1",
+]
+
+[project.scripts]
+trustdesk = "trustdesk.cli:main"
+
+[tool.ruff]
+line-length = 79
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+
+[tool.pyright]
+include = ["src", "tests"]
+typeCheckingMode = "standard"
+pythonVersion = "3.12"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+```
+
+The fields have different purposes:
+
+```
+[build-system] → how the package is built
+[project]      → package metadata and runtime dependencies
+[dependency-groups] → development dependencies
+[project.scripts]   → installed CLI commands
+[tool.*]        → Ruff, Pyright, pytest, and other tools
+```
+
+# 4. uv workflow
+
+Create a project:
+
+```
+uv init trustdesk
+cd trustdesk
+```
+
+Add runtime dependencies:
+
+```
+uv add httpx
+```
+
+Add development dependencies:
+
+```
+uv add --dev pytest pytest-cov ruff pyright
+```
+
+Synchronize the environment:
+
+```
+uv sync
+```
+
+Run commands inside the managed environment:
+
+```
+uv run pytest
+uv run ruff check .
+uv run pyright
+```
+
+Run your application:
+
+```
+uv run python -m trustdesk
+```
+
+Create a console command using `[project.scripts]`:
+
+```
+[project.scripts]
+trustdesk = "trustdesk.cli:main"
+```
+
+Then run:
+
+```
+uv run trustdesk
+```
+
+`uv` manages project dependencies and records exact resolutions in `uv.lock`; the official workflow includes `uv add`, `uv sync`, `uv run`, and building publishable distributions.[[docs.astral](https://docs.astral.sh/uv/concepts/projects/dependencies/)][[docs.astral](https://docs.astral.sh/uv/guides/projects/)]
+
+## Commit these
+
+```
+pyproject.toml
+uv.lock
+```
+
+## Do not commit these
+
+```
+.venv/
+__pycache__/
+*.pyc
+dist/
+build/
+*.egg-info/
+```
+
+# 5. Virtual environments
+
+Using standard Python:
+
+```
+python -m venv .venv
+```
+
+Activate on Linux/macOS:
+
+```
+source .venv/bin/activate
+```
+
+Activate on Windows PowerShell:
+
+```
+.venv\Scripts\Activate.ps1
+```
+
+Install your project:
+
+```
+python -m pip install -e .
+```
+
+Using uv, you usually do not need to activate the environment manually:
+
+```
+uv sync
+uv run python app.py
+```
+
+The environment prevents conflicts between projects:
+
+```
+TrustDesk → httpx version A
+Burvex    → httpx version B
+```
+
+Each project can have its own dependency resolution.
+
+# 6. uv, Hatch, and Poetry
+
+|Tool|Best known for|Use it when|
+|---|---|---|
+|uv|Fast environments, dependencies, lockfiles, Python versions|Strong default for new projects|
+|Hatch/Hatchling|Build backend and environment management|Publishing libraries or using Hatch workflows|
+|Poetry|Integrated dependency and project management|Your team already standardizes on Poetry|
+|pip + venv|Minimal standard workflow|Small scripts or maximum simplicity|
+
+You do not need to use all of them.
+
+A clean combination is:
+
+```
+uv          → dependency and environment management
+Hatchling   → package build backend
+pyproject   → metadata and tool configuration
+```
+
+Hatchling does not prevent you from using uv. One manages building; the other manages the development environment and dependencies.
+
+# 7. Building packages
+
+Build a wheel and source distribution:
+
+```
+uv build
+```
+
+or:
+
+```
+python -m build
+```
+
+The result is usually:
+
+```
+dist/
+├── trustdesk-0.1.0-py3-none-any.whl
+└── trustdesk-0.1.0.tar.gz
+```
+
+A wheel is a ready-to-install built distribution.
+
+A source distribution contains source code and build metadata.
+
+Test the wheel in a clean environment:
+
+```
+python -m venv /tmp/test-env
+source /tmp/test-env/bin/activate
+
+python -m pip install dist/*.whl
+python -c "import trustdesk"
+```
+
+This catches errors that local development may hide:
+
+- Missing package files.
+- Broken imports.
+- Incorrect metadata.
+- Missing dependencies.
+- Incorrect console scripts.
+- Improper package discovery.
+
+The Python Packaging User Guide recommends building distribution artifacts and testing installation before publishing.[[packaging.python](https://packaging.python.org/tutorials/packaging-projects/)]
+
+# 8. Publishing
+
+Install Twine:
+
+```
+python -m pip install twine
+```
+
+Upload to TestPyPI first:
+
+```
+python -m twine upload \
+    --repository testpypi \
+    dist/*
+```
+
+Then test installation:
+
+```
+python -m pip install \
+    --index-url https://test.pypi.org/simple/ \
+    trustdesk
+```
+
+After verification:
+
+```
+python -m twine upload dist/*
+```
+
+Use:
+
+- API tokens.
+- CI secret storage.
+- Trusted publishing.
+- Environment variables.
+
+Never put package-index credentials in:
+
+```
+source code
+pyproject.toml
+README.md
+Git commits
+```
+
+Do not overwrite an existing published version. Release a new version:
+
+```
+0.1.0 → 0.1.1
+```
+
+# 9. Dependency management at scale
+
+Separate dependencies into categories.
+
+## Runtime dependencies
+
+```
+[project]
+dependencies = [
+    "httpx>=0.27,<1.0",
+]
+```
+
+Required when users install and run your package.
+
+## Development dependencies
+
+```
+[dependency-groups]
+dev = [
+    "pytest",
+    "ruff",
+    "pyright",
+]
+```
+
+Needed for development and CI, but not for normal package users.
+
+## Optional feature dependencies
+
+```
+[project.optional-dependencies]
+postgres = [
+    "psycopg[binary]>=3.2",
+]
+```
+
+Users install:
+
+```
+pip install trustdesk[postgres]
+```
+
+Applications should normally commit a lockfile:
+
+```
+uv.lock
+```
+
+Libraries should generally declare compatible dependency ranges rather than forcing one exact version unless necessary.
+
+A useful distinction:
+
+```
+Application → lock exact versions
+Library     → publish compatible version ranges
+```
+
+# 10. Configuration and secrets
+
+Do not hardcode:
+
+```
+API_KEY = "secret"
+```
+
+Use environment variables:
+
+```
+import os
+
+
+api_key = os.environ["TRUSTDESK_API_KEY"]
+```
+
+Typed settings object:
+
+```
+from dataclasses import dataclass
+import os
+
+
+@dataclass(frozen=True)
+class Settings:
+    model_name: str
+    debug: bool
+
+
+def load_settings() -> Settings:
+    return Settings(
+        model_name=os.getenv(
+            "MODEL_NAME",
+            "default-model",
+        ),
+        debug=os.getenv(
+            "DEBUG",
+            "false",
+        ).lower() == "true",
+    )
+```
+
+Keep configuration loading separate from business logic.
+
+# 11. Application architecture
+
+A useful dependency direction is:
+
+```
+CLI/API
+  ↓
+application services
+  ↓
+domain objects and rules
+  ↓
+interfaces/protocols
+  ↑
+infrastructure implementations
+```
+
+Example protocol:
+
+```
+from typing import Protocol
+
+
+class TicketRepository(Protocol):
+    def save(self, ticket: dict) -> None:
+        ...
+
+    def get_by_id(
+        self,
+        ticket_id: str,
+    ) -> dict | None:
+        ...
+```
+
+Application service:
+
+```
+class TicketService:
+    def __init__(
+        self,
+        repository: TicketRepository,
+    ):
+        self._repository = repository
+
+    def create_ticket(
+        self,
+        ticket: dict,
+    ) -> dict:
+        self._repository.save(ticket)
+        return ticket
+```
+
+Infrastructure implementation:
+
+```
+class InMemoryTicketRepository:
+    def __init__(self):
+        self._tickets = {}
+
+    def save(self, ticket):
+        self._tickets[ticket["id"]] = ticket
+
+    def get_by_id(self, ticket_id):
+        return self._tickets.get(ticket_id)
+```
+
+The application service does not depend directly on PostgreSQL, Redis, or a cloud API.
+
+# 12. Professional command sequence
+
+For a new project:
+
+```
+uv init trustdesk
+cd trustdesk
+
+uv add httpx
+uv add --dev pytest pytest-cov ruff pyright
+
+uv sync
+
+uv run ruff check .
+uv run ruff format .
+uv run pyright
+uv run pytest --cov=src
+
+uv build
+```
+
+For CI:
+
+```
+uv sync --locked
+uv run ruff check .
+uv run ruff format --check .
+uv run pyright
+uv run pytest --cov=src
+```
+
+The `--locked` behavior helps ensure CI uses the committed lockfile rather than silently resolving a different environment.
+
+# 13. Mistakes to avoid
+
+- Put code in `src/`, not randomly throughout the project root.
+- Do not commit `.venv`.
+- Do commit the lockfile for applications.
+- Do not publish without testing the wheel.
+- Do not hardcode secrets.
+- Do not mix package managers carelessly.
+- Do not add multiple packages before the project needs them.
+- Do not expose internal modules as public API accidentally.
+- Do not use editable installs as your production deployment artifact.
+- Do not publish a new build under an already-used version.
+
+# 14. Final recommendation
+
+For your current projects, use:
+
+```
+src/ layout
+pyproject.toml
+uv
+uv.lock
+Hatchling
+pytest
+Ruff
+Pyright
+```
+
+Recommended development loop:
+
+```
+uv add dependency
+uv sync
+uv run pytest
+uv run ruff check .
+uv run pyright
+uv build
+```
+
+The main principle is:
+
+> Use `pyproject.toml` to describe the project, uv to reproduce the environment, a build backend to create artifacts, and clean package boundaries to keep the application maintainable.
+
+For TrustDesk or Burvex, begin with one well-structured package. Move to a workspace or multiple independently published packages only when shared libraries, independent releases, or team boundaries justify the added complexity.[[packaging.python](https://packaging.python.org/en/latest/guides/writing-pyproject-toml/)][[docs.astral](https://docs.astral.sh/uv/concepts/projects/dependencies/)][[docs.astral](https://docs.astral.sh/uv/guides/projects/)][[packaging.python](https://packaging.python.org/tutorials/packaging-projects/)]
