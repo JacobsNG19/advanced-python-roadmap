@@ -1,585 +1,323 @@
-# Iterators, Generators & Context Managers — Solutions
+# Iterators, Generators & Context Managers — Exercises
 
-These solutions correspond to:
+## Instructions
 
-```text
-Iterators, Generators & Context Managers - Exercises.md
-```
+Solve each question independently. Choose your own implementation. The questions describe required behavior but do not prescribe a particular technique.
 
 ---
 
 ## Exercise 1 — Consume a sequence
 
+Given:
+
 ```python
 values = [10, 20, 30]
-iterator = iter(values)
-
-while True:
-    try:
-        print(next(iterator))
-    except StopIteration:
-        break
 ```
 
-`iter()` obtains an iterator, while `next()` requests the next value. `StopIteration` signals completion.
+Read the values one at a time and detect when there are no more values.
+
+Expected values:
+
+```text
+10
+20
+30
+```
 
 ---
 
 ## Exercise 2 — Countdown
 
+Create `Countdown(start)`.
+
+Its values must begin at `start` and continue down to `0`.
+
 ```python
-class Countdown:
-    def __init__(self, start: int):
-        self.current = start
-
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        if self.current < 0:
-            raise StopIteration
-
-        value = self.current
-        self.current -= 1
-        return value
+assert list(Countdown(3)) == [3, 2, 1, 0]
 ```
 
 ---
 
 ## Exercise 3 — Step sequence
 
+Create `StepSequence(start, stop, step)`.
+
+Produce values beginning at `start`, stopping before `stop`, and changing by `step`.
+
 ```python
-class StepSequence:
-    def __init__(self, start, stop, step=1):
-        if step == 0:
-            raise ValueError("step cannot be zero.")
-
-        self.current = start
-        self.stop = stop
-        self.step = step
-
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        if self.step > 0 and self.current >= self.stop:
-            raise StopIteration
-
-        if self.step < 0 and self.current <= self.stop:
-            raise StopIteration
-
-        value = self.current
-        self.current += self.step
-        return value
+assert list(StepSequence(0, 10, 2)) == [0, 2, 4, 6, 8]
+assert list(StepSequence(5, 0, -2)) == [5, 3, 1]
 ```
+
+A step of zero must be rejected.
 
 ---
 
 ## Exercise 4 — Reusable collection
 
+Create `TicketCollection` containing ticket IDs.
+
+The collection must:
+
+- Support repeated iteration.
+- Support `len(collection)`.
+- Support `collection[index]`.
+
 ```python
-class TicketCollection:
-    def __init__(self, ticket_ids):
-        self._ticket_ids = list(ticket_ids)
+collection = TicketCollection(["T-001", "T-002"])
 
-    def __iter__(self):
-        return iter(self._ticket_ids)
-
-    def __len__(self):
-        return len(self._ticket_ids)
-
-    def __getitem__(self, index):
-        return self._ticket_ids[index]
+assert list(collection) == ["T-001", "T-002"]
+assert list(collection) == ["T-001", "T-002"]
+assert len(collection) == 2
+assert collection[0] == "T-001"
 ```
-
-The collection returns a fresh iterator each time, so repeated iteration works.
 
 ---
 
 ## Exercise 5 — Positive values
 
+Create `positive_values(values)` that produces only values greater than zero.
+
 ```python
-def positive_values(values):
-    for value in values:
-        if value > 0:
-            yield value
+assert list(positive_values([-2, 0, 3, -1, 5])) == [3, 5]
 ```
 
 ---
 
 ## Exercise 6 — Even numbers
 
+Create `even_numbers(limit)` that produces even numbers from `0` through `limit`.
+
 ```python
-def even_numbers(limit):
-    for number in range(0, limit + 1, 2):
-        yield number
+assert list(even_numbers(10)) == [0, 2, 4, 6, 8, 10]
 ```
 
 ---
 
 ## Exercise 7 — Squares
 
-```python
-def squares():
-    return (
-        number * number
-        for number in range(10)
-    )
-```
+Create a lazy sequence of the squares from `0` through `9`.
 
-This returns a lazy generator expression.
+```python
+assert list(squares()) == [
+    0, 1, 4, 9, 16,
+    25, 36, 49, 64, 81,
+]
+```
 
 ---
 
 ## Exercise 8 — Non-empty file lines
 
-```python
-def non_empty_lines(path):
-    with open(path, encoding="utf-8") as file:
-        for line in file:
-            cleaned = line.strip()
+Create `non_empty_lines(path)`.
 
-            if cleaned:
-                yield cleaned
+It must read a text file, remove surrounding whitespace, ignore blank lines, and produce the remaining lines one at a time.
+
+For a file containing:
+
+```text
+ First line
+
+ Second line
 ```
 
-The file remains open while the generator is being consumed because the `with` block is inside the generator function.
+expected output:
+
+```python
+["First line", "Second line"]
+```
 
 ---
 
 ## Exercise 9 — Text processing pipeline
 
+Create `process_text(values)` that:
+
+1. Removes surrounding whitespace.
+2. Ignores empty values.
+3. Converts remaining values to lowercase.
+
 ```python
-def process_text(values):
-    stripped = (
-        value.strip()
-        for value in values
-    )
-
-    non_empty = (
-        value
-        for value in stripped
-        if value
-    )
-
-    return (
-        value.lower()
-        for value in non_empty
-    )
+assert list(process_text([
+    "  Python  ",
+    "",
+    "  AI  ",
+])) == ["python", "ai"]
 ```
-
-All stages are lazy until the caller consumes the result.
 
 ---
 
 ## Exercise 10 — Flatten batches
 
-```python
-def flatten(batches):
-    for batch in batches:
-        yield from batch
-```
+Create `flatten(batches)`.
 
-`yield from` delegates value production to each nested batch.
+```python
+batches = [
+    ["T-001", "T-002"],
+    ["T-003"],
+    ["T-004", "T-005"],
+]
+
+assert list(flatten(batches)) == [
+    "T-001",
+    "T-002",
+    "T-003",
+    "T-004",
+    "T-005",
+]
+```
 
 ---
 
 ## Exercise 11 — Stream with a final total
 
-```python
-def values_with_total(values):
-    total = 0
+Create `values_with_total(values)`.
 
-    for value in values:
-        total += value
-        yield value
+It must produce every input value and make the final total available when the sequence finishes.
 
-    return total
-```
-
-The return value is stored in the final `StopIteration.value`.
-
-Example:
-
-```python
-generator = values_with_total([1, 2, 3])
-
-assert next(generator) == 1
-assert next(generator) == 2
-assert next(generator) == 3
-
-try:
-    next(generator)
-except StopIteration as error:
-    assert error.value == 6
-```
+For `[1, 2, 3]`, the produced values must be `1`, `2`, and `3`, and the final total must be `6`.
 
 ---
 
 ## Exercise 12 — Resource session
 
+Create a `Session` resource that can be used like this:
+
 ```python
-class Session:
-    def __enter__(self):
-        self.active = True
-        return self
-
-    def send(self, message):
-        if not self.active:
-            raise RuntimeError("Session is inactive.")
-
-        return f"Sent: {message}"
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        self.active = False
-        return False
+with Session() as session:
+    assert session.send("hello") == "Sent: hello"
 ```
+
+The session must be active inside the block and inactive after the block.
 
 ---
 
 ## Exercise 13 — Cleanup after success and failure
 
-```python
-class CleanupResource:
-    def __init__(self):
-        self.cleaned = False
+Create a resource that records whether cleanup happened.
 
-    def __enter__(self):
-        return self
+Verify that cleanup happens when:
 
-    def __exit__(self, exc_type, exc_value, traceback):
-        self.cleaned = True
-        return False
-```
+1. The block completes normally.
+2. The block raises an exception.
 
-Success:
-
-```python
-resource = CleanupResource()
-
-with resource:
-    pass
-
-assert resource.cleaned is True
-```
-
-Failure:
-
-```python
-resource = CleanupResource()
-
-try:
-    with resource:
-        raise ValueError("Failure")
-except ValueError:
-    pass
-
-assert resource.cleaned is True
-```
+The exception must not be hidden.
 
 ---
 
 ## Exercise 14 — Suppress one exception type
 
-```python
-class SuppressValueError:
-    def __enter__(self):
-        return self
+Create a resource that suppresses `ValueError` but does not suppress `TypeError`.
 
-    def __exit__(self, exc_type, exc_value, traceback):
-        return exc_type is ValueError
+```python
+with YourResource():
+    raise ValueError("ignored")
 ```
 
-`__exit__()` returns `True` only for `ValueError`; other exceptions continue normally.
+The program must continue after the first block.
 
 ---
 
 ## Exercise 15 — Timer resource
 
-```python
-from time import perf_counter
+Create `Timer(label)`.
 
-
-class Timer:
-    def __init__(self, label="Block"):
-        self.label = label
-
-    def __enter__(self):
-        self.start = perf_counter()
-        return self
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        elapsed = perf_counter() - self.start
-        print(
-            f"{self.label}: "
-            f"{elapsed:.6f} seconds"
-        )
-        return False
-```
-
-The cleanup code runs from `__exit__()` regardless of whether the block succeeds or raises.
+It must report the elapsed time after the block finishes, including when the block raises an exception.
 
 ---
 
 ## Exercise 16 — Temporary setting
 
-```python
-from contextlib import contextmanager
+Create `temporary_setting(settings, key, value)`.
 
+Inside the block, the setting must have the temporary value. After the block, the previous state must be restored.
 
-@contextmanager
-def temporary_setting(settings, key, value):
-    existed = key in settings
-    old_value = settings.get(key)
+Test both cases:
 
-    settings[key] = value
-
-    try:
-        yield settings
-    finally:
-        if existed:
-            settings[key] = old_value
-        else:
-            settings.pop(key, None)
-```
-
-Test an existing key:
-
-```python
-settings = {"debug": False}
-
-with temporary_setting(settings, "debug", True):
-    assert settings["debug"] is True
-
-assert settings["debug"] is False
-```
-
-Test a missing key:
-
-```python
-settings = {}
-
-with temporary_setting(settings, "debug", True):
-    assert settings["debug"] is True
-
-assert "debug" not in settings
-```
+- The key existed before the block.
+- The key did not exist before the block.
 
 ---
 
 ## Exercise 17 — Managed text file
 
+Create a resource that opens a text file on entry and closes it on exit.
+
+Use it like this:
+
 ```python
-class ManagedFile:
-    def __init__(self, path, mode="r"):
-        self.path = path
-        self.mode = mode
-        self.file = None
-
-    def __enter__(self):
-        self.file = open(
-            self.path,
-            self.mode,
-            encoding="utf-8",
-        )
-        return self.file
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        if self.file is not None:
-            self.file.close()
-
-        return False
+with ManagedFile("notes.txt", "w") as file:
+    file.write("Python")
 ```
 
-In ordinary application code, prefer Python’s built-in `open()` context manager. This exercise demonstrates the protocol.
+After the block, the file must be closed.
 
 ---
 
 ## Exercise 18 — Dynamic file reading
 
+Given a list of file paths, read all files safely and return their contents.
+
+The number of files is not fixed in advance.
+
 ```python
-from contextlib import ExitStack
-
-
-def read_files(paths):
-    with ExitStack() as stack:
-        files = [
-            stack.enter_context(
-                path.open(encoding="utf-8")
-            )
-            for path in paths
-        ]
-
-        return [file.read() for file in files]
+assert read_files([first, second]) == ["A", "B"]
 ```
-
-`ExitStack` closes all registered resources when the block exits.
 
 ---
 
 ## Exercise 19 — Async session
 
-```python
-import asyncio
-
-
-class AsyncSession:
-    async def __aenter__(self):
-        self.active = True
-        return self
-
-    async def fetch(self, resource):
-        if not self.active:
-            raise RuntimeError("Session is inactive.")
-
-        await asyncio.sleep(0.01)
-        return f"Fetched: {resource}"
-
-    async def __aexit__(self, exc_type, exc_value, traceback):
-        self.active = False
-        return False
-```
-
-Use:
+Create an asynchronous session usable like this:
 
 ```python
-async def main():
-    async with AsyncSession() as session:
-        result = await session.fetch("resource")
-        assert result == "Fetched: resource"
-
-
-asyncio.run(main())
+async with AsyncSession() as session:
+    result = await session.fetch("resource")
 ```
+
+The session must open before the block and close afterward.
 
 ---
 
 ## Exercise 20 — Async event stream
 
-```python
-import asyncio
+Create an asynchronous event source that produces:
 
-
-async def event_stream():
-    for event in [
-        "ticket.created",
-        "ticket.classified",
-        "ticket.closed",
-    ]:
-        await asyncio.sleep(0.01)
-        yield event
-
-
-async def main():
-    events = []
-
-    async for event in event_stream():
-        events.append(event)
-
-    assert events == [
-        "ticket.created",
-        "ticket.classified",
-        "ticket.closed",
-    ]
-
-
-asyncio.run(main())
+```text
+ticket.created
+ticket.classified
+ticket.closed
 ```
+
+with a small pause between events.
+
+Consume it and verify the event order.
 
 ---
 
 ## Exercise 21 — Final streaming pipeline
 
+Build a complete pipeline that:
+
+1. Receives raw ticket dictionaries.
+2. Normalizes their text.
+3. Keeps only high-priority tickets.
+4. Produces only ticket IDs.
+5. Measures execution time with a managed timer.
+
+Expected result:
+
 ```python
-from contextlib import contextmanager
-from time import perf_counter
-
-
-def normalize_tickets(records):
-    for record in records:
-        yield {
-            "id": record["id"],
-            "text": record["text"].strip().lower(),
-            "priority": record.get(
-                "priority",
-                "normal",
-            ),
-        }
-
-
-def high_priority(tickets):
-    for ticket in tickets:
-        if ticket["priority"] == "high":
-            yield ticket
-
-
-def ticket_ids(tickets):
-    for ticket in tickets:
-        yield ticket["id"]
-
-
-@contextmanager
-def timer(label):
-    start = perf_counter()
-
-    try:
-        yield
-    finally:
-        elapsed = perf_counter() - start
-        print(
-            f"{label}: "
-            f"{elapsed:.6f} seconds"
-        )
-
-
-records = [
-    {
-        "id": "T-001",
-        "text": " Urgent login failure ",
-        "priority": "high",
-    },
-    {
-        "id": "T-002",
-        "text": "General question",
-        "priority": "normal",
-    },
-    {
-        "id": "T-003",
-        "text": " Urgent payment failure ",
-        "priority": "high",
-    },
+[
+    "T-001",
+    "T-003",
 ]
-
-with timer("Ticket pipeline"):
-    result = list(
-        ticket_ids(
-            high_priority(
-                normalize_tickets(records)
-            )
-        )
-    )
-
-assert result == ["T-001", "T-003"]
 ```
 
-The pipeline remains lazy until `list()` consumes it.
+# Practice rules
 
----
-
-# Review checklist
-
-You should now understand:
-
-- The difference between an iterable and an iterator.
-- Why `__iter__()` and `__next__()` are needed.
-- Why `StopIteration` ends iteration.
-- Why generators are lazy and usually one-shot.
-- How `yield from` delegates production.
-- How generator pipelines avoid unnecessary intermediate lists.
-- How `__enter__()` and `__exit__()` implement `with`.
-- How `__exit__()` receives exception information.
-- How returning `True` suppresses an exception.
-- Why cleanup belongs in `finally`.
-- How `contextmanager` simplifies context-manager creation.
-- Why async resources use `async with`.
-- How async generators support streaming.
+- Solve the questions in order.
+- Do not look at the solution file until you have attempted the problem.
+- Add at least one edge-case test for every exercise.
+- Check that lazy sequences are not unnecessarily converted into lists.
+- Check that resources are cleaned up when exceptions occur.
